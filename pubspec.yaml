@@ -43,11 +43,30 @@ dependencies:
   # Authentication
   google_sign_in: ^6.2.1
 
+  # Payment
+  flutter_stripe: ^9.2.0
+  stripe_android: ^9.2.0
+  stripe_ios: ^9.2.0
+  stripe_platform_interface: ^9.2.0
+
+  # QR Code
+  qr_flutter: ^4.1.0
+  qr_code_scanner: ^1.0.1
+
   # Utils
   intl: ^0.19.0
   url_launcher: ^6.2.5
   flutter_rating_bar: ^4.0.1
   cached_network_image: ^3.3.1
+
+  # Security
+  local_auth: ^2.1.6
+  crypto: ^3.0.3
+
+  # Internationalization
+  easy_localization: ^3.0.2
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
