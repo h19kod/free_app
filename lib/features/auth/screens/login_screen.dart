@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/animated_widgets.dart';
+import '../../../core/services/animation_service.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -56,17 +58,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   child: const Icon(Icons.store_rounded, color: Colors.white, size: 40),
                 ),
-              ),
+              ).animateWithBounce(),
               const SizedBox(height: 32),
               const Text(
                 'Welcome Back!',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
+              ).animateWithSlide(direction: SlideDirection.left),
               const SizedBox(height: 8),
               Text(
                 'Sign in to continue to AppMarket',
                 style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
-              ),
+              ).animateWithSlide(direction: SlideDirection.right),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -90,29 +92,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-              ),
+              ).animateWithScale(),
               const SizedBox(height: 40),
               if (authState.error != null)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.error_outline, color: AppTheme.error, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          authState.error!,
-                          style: TextStyle(color: AppTheme.error, fontSize: 13),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                AnimatedStatusWidget(
+                  isSuccess: false,
+                  message: authState.error!,
+                ).animateWithShake(),
               Form(
                 key: _formKey,
                 child: Column(
@@ -154,16 +140,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: authState.isLoading ? null : _login,
-                      child: authState.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2),
-                            )
-                          : const Text('Sign In'),
+                    AnimatedButton(
+                      text: 'Sign In',
+                      onPressed: authState.isLoading ? () {} : _login,
+                      isLoading: authState.isLoading,
+                      width: double.infinity,
+                      height: 48,
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -182,9 +164,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
+                        ).animateWithPulse(),
                       ],
-                    ),
+                    ).animateWithFade(delay: const Duration(milliseconds: 200)),
                   ],
                 ),
               ),
