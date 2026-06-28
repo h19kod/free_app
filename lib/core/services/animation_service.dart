@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class AnimationService {
   // Animation durations
@@ -95,7 +94,7 @@ class AnimationService {
   }) {
     return child
         .animate(delay: delay)
-        .scale(begin: begin, end: 1.0, duration: duration, curve: curve)
+        .scaleXY(begin: begin, end: 1.0, duration: duration, curve: curve)
         .fadeIn(duration: duration * 0.8, curve: curve);
   }
 
@@ -108,7 +107,7 @@ class AnimationService {
   }) {
     return child
         .animate(delay: delay)
-        .scale(begin: 0.0, end: 1.0, duration: duration, curve: curve)
+        .scaleXY(begin: 0.0, end: 1.0, duration: duration, curve: curve)
         .fadeIn(duration: duration * 0.8, curve: curve);
   }
 
@@ -137,7 +136,7 @@ class AnimationService {
   }) {
     return child
         .animate(onPlay: (controller) => controller.repeat(reverse: true))
-        .scale(
+        .scaleXY(
           begin: 1.0,
           end: scale,
           duration: duration,
@@ -156,7 +155,7 @@ class AnimationService {
         .shake(
           duration: duration,
           hz: 4,
-          offset: offset,
+          offset: Offset(offset, 0),
           rotation: 0.05,
         );
   }
@@ -209,25 +208,16 @@ class AnimationService {
     Duration delay = Duration.zero,
     double slideOffset = 0.1,
   }) {
-    return AnimationLimiter(
-      child: Column(
-        children: children.asMap().entries.map((entry) {
-          final index = entry.key;
-          final child = entry.value;
-          
-          return AnimationConfiguration.staggeredList(
-            position: index,
-            duration: duration,
-            delay: delay,
-            child: SlideAnimation(
-              verticalOffset: slideOffset,
-              child: FadeInAnimation(
-                child: child,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+    return Column(
+      children: children.asMap().entries.map((entry) {
+        final index = entry.key;
+        final child = entry.value;
+        
+        return child
+            .animate(delay: delay + Duration(milliseconds: index * 100))
+            .slideY(begin: slideOffset, end: 0.0, duration: duration)
+            .fadeIn(duration: duration);
+      }).toList(),
     );
   }
 
@@ -239,26 +229,17 @@ class AnimationService {
     Duration delay = Duration.zero,
     double slideOffset = 0.1,
   }) {
-    return AnimationLimiter(
-      child: GridView.count(
-        crossAxisCount: columns,
-        children: children.asMap().entries.map((entry) {
-          final index = entry.key;
-          final child = entry.value;
-          
-          return AnimationConfiguration.staggeredGrid(
-            position: index,
-            duration: duration,
-            delay: delay,
-            columnCount: columns,
-            child: ScaleAnimation(
-              child: FadeInAnimation(
-                child: child,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+    return GridView.count(
+      crossAxisCount: columns,
+      children: children.asMap().entries.map((entry) {
+        final index = entry.key;
+        final child = entry.value;
+        
+        return child
+            .animate(delay: delay + Duration(milliseconds: index * 100))
+            .scaleXY(begin: 0.0, end: 1.0, duration: duration)
+            .fadeIn(duration: duration);
+      }).toList(),
     );
   }
 
@@ -315,9 +296,9 @@ class AnimationService {
   }) {
     return child
         .animate(onComplete: (controller) => onComplete?.call())
-        .scale(begin: 0.0, end: 1.2, duration: duration * 0.5, curve: elasticCurve)
+        .scaleXY(begin: 0.0, end: 1.2, duration: duration * 0.5, curve: elasticCurve)
         .then()
-        .scale(begin: 1.2, end: 1.0, duration: duration * 0.5, curve: sharpCurve);
+        .scaleXY(begin: 1.2, end: 1.0, duration: duration * 0.5, curve: sharpCurve);
   }
 
   // Error animation
@@ -328,7 +309,7 @@ class AnimationService {
   }) {
     return child
         .animate(onComplete: (controller) => onComplete?.call())
-        .shake(duration: duration, hz: 5, offset: 15.0)
+        .shake(duration: duration, hz: 5, offset: Offset(15.0, 0))
         .then()
         .tint(color: Colors.red, duration: duration * 0.5)
         .then()
@@ -354,16 +335,16 @@ class AnimationService {
   }) {
     return child
         .animate(onPlay: (controller) => controller.repeat(reverse: true))
-        .shadowColor(
-          begin: Colors.transparent,
-          end: glowColor.withValues(alpha: 0.5),
+        .scaleXY(
+          begin: 1.0,
+          end: 1.05,
           duration: duration,
           curve: Curves.easeInOut,
         )
         .then()
-        .shadowBlur(
-          begin: 0,
-          end: 20.0,
+        .scaleXY(
+          begin: 1.05,
+          end: 1.0,
           duration: duration,
           curve: Curves.easeInOut,
         );
@@ -412,26 +393,19 @@ class AnimationService {
   // Custom staggered animation for complex layouts
   static Widget customStagger({
     required List<Widget> children,
-    required List<AnimationEffect> effects,
+    required List<Effect> effects,
     Duration? delay,
   }) {
-    return AnimationLimiter(
-      child: Column(
-        children: children.asMap().entries.map((entry) {
-          final index = entry.key;
-          final child = entry.value;
-          
-          return AnimationConfiguration.staggeredList(
-            position: index,
-            duration: mediumDuration,
-            delay: delay ?? Duration(milliseconds: index * 100),
-            child: Animate(
-              effects: effects,
-              child: child,
-            ),
-          );
-        }).toList(),
-      ),
+    return Column(
+      children: children.asMap().entries.map((entry) {
+        final index = entry.key;
+        final child = entry.value;
+        
+        return child
+            .animate(delay: delay ?? Duration(milliseconds: index * 100))
+            .then()
+            .animate(effects: effects);
+      }).toList(),
     );
   }
 }

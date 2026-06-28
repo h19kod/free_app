@@ -32,9 +32,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuth = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
 
+      print('🔀 Router redirect check:');
+      print('   - Current location: ${state.matchedLocation}');
+      print('   - Is logged in: $isLoggedIn');
+      print('   - Is splash: $isSplash');
+      print('   - Is auth page: $isAuth');
+
       if (isSplash) return null;
-      if (!isLoggedIn && !isAuth) return '/login';
-      if (isLoggedIn && isAuth) return '/marketplace';
+      if (!isLoggedIn && !isAuth) {
+        print('   -> Redirecting to /login');
+        return '/login';
+      }
+      if (isLoggedIn && isAuth) {
+        print('   -> Redirecting to /marketplace');
+        return '/marketplace';
+      }
+      print('   -> No redirect');
       return null;
     },
     routes: [

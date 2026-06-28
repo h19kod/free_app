@@ -10,7 +10,7 @@ const String baseUrl = 'http://10.0.2.2:8000/api/v1'; // Android emulator
 const bool testMode = true;
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError();
+  throw UnimplementedError('SharedPreferences must be initialized in main.dart');
 });
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -21,6 +21,11 @@ final apiServiceProvider = Provider<ApiService>((ref) {
 class ApiService {
   late final Dio _dio;
   final SharedPreferences _prefs;
+
+  // Placeholder constructor for loading states
+  factory ApiService.placeholder() {
+    throw UnimplementedError('Use ApiService(SharedPreferences) instead');
+  }
 
   ApiService(this._prefs) {
     _dio = Dio(BaseOptions(
@@ -50,7 +55,10 @@ class ApiService {
   String? get token => _prefs.getString('token');
 
   Future<void> saveToken(String token) async {
+    print('💾 Saving token: $token');
     await _prefs.setString('token', token);
+    final savedToken = _prefs.getString('token');
+    print('✅ Token saved successfully: ${savedToken != null ? "YES" : "NO"}');
   }
 
   Future<void> clearToken() async {

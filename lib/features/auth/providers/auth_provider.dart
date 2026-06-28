@@ -36,6 +36,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final ApiService _api;
 
   AuthNotifier(this._api) : super(const AuthState()) {
+    print('🔧 AuthNotifier initialized');
     _checkAuth();
   }
 
@@ -55,18 +56,30 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> login(String email, String password) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
+      print('🔐 Login attempt: $email');
+      
       final res = await _api.login(email, password);
+      print('✅ Login response received');
       
       // Check if response contains token
       if (res.data['access_token'] == null) {
+        print('❌ No access token in response');
         throw Exception('No access token received');
       }
       
+      print('💾 Saving token...');
       await _api.saveToken(res.data['access_token']);
+      print('✅ Token saved');
+      
+      print('👤 Getting user info...');
       final meRes = await _api.getMe();
+      print('✅ User info received: ${meRes.data}');
+      
       state = AuthState(isAuthenticated: true, user: meRes.data, isLoading: false);
+      print('🎉 Login successful!');
       return true;
     } catch (e) {
+      print('❌ Login error: $e');
       String errorMessage = 'Invalid email or password';
       
       // More specific error messages
@@ -113,5 +126,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.watch(apiServiceProvider));
+  final api = ref.watch(apiServiceProvider);
+  print('✅ ApiService loaded successfully');
+  return AuthNotifier(api);
 });
