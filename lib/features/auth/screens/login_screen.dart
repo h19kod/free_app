@@ -28,12 +28,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
+    
+    print('🔐 Attempting login with: ${_emailController.text.trim()}');
+    
     final success = await ref.read(authProvider.notifier).login(
           _emailController.text.trim(),
           _passwordController.text,
         );
+    
+    print('🎯 Login result: $success');
+    
     if (success && mounted) {
+      print('🚀 Navigating to /marketplace');
       context.go('/marketplace');
+    } else if (mounted) {
+      print('❌ Login failed');
     }
   }
 

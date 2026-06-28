@@ -67,6 +67,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: widget.isLoading ? null : widget.onPressed,
       onTapDown: (_) {
         if (!widget.isLoading) {
           setState(() => _isPressed = true);
@@ -294,17 +295,10 @@ class AnimatedListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimationConfiguration.staggeredList(
-      position: index,
-      duration: const Duration(milliseconds: 375),
-      delay: delay ?? Duration(milliseconds: index * 50),
-      child: SlideAnimation(
-        verticalOffset: 50.0,
-        child: FadeInAnimation(
-          child: child,
-        ),
-      ),
-    );
+    return child
+        .animate(delay: delay ?? Duration(milliseconds: index * 50))
+        .slideY(begin: 0.3, end: 0.0, duration: const Duration(milliseconds: 375))
+        .fadeIn(duration: const Duration(milliseconds: 375));
   }
 }
 

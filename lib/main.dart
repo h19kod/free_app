@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
@@ -13,26 +12,23 @@ void main() async {
   // Initialize EasyLocalization
   await EasyLocalization.ensureInitialized();
   
-  // Initialize Stripe
-  Stripe.publishableKey = 'pk_test_51234567890abcdef';
-  
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   
   runApp(
-    EasyLocalization(
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('ar', 'SA'),
-        Locale('fr', 'FR'),
-        Locale('es', 'ES'),
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('en', 'US'),
-      child: ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
+      child: EasyLocalization(
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('ar', 'SA'),
+          Locale('fr', 'FR'),
+          Locale('es', 'ES'),
         ],
+        path: 'assets/translations',
+        fallbackLocale: const Locale('en', 'US'),
         child: const AppMarketApp(),
       ),
     ),
